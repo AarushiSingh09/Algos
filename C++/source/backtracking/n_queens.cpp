@@ -12,86 +12,55 @@
     O(1), constant amount of extra space
 */
 
-#include <iostream>
-
+#include<iostream>
 using namespace std;
+#define N 4
 
-const int MaxQueens = 40;
-bool board[MaxQueens][MaxQueens];
-
-void initBoard(const size_t size) {
-    size_t r, c;
-    for (r = 0; r < size; r++)
-        for (c = 0; c < size; c++)
-            board[r][c] = false;
-}
-
-void showBoard(const size_t size) {
-    size_t r, c;
-    for (r = 0; r < size; r++) {
-        for (c = 0; c < size; c++) {
-            if (board[r][c])
-                cout << 'Q';
-            else
-                cout << '.';
-            cout << ' ';
+void PrintSolution(int board[N][N]){
+    for (int i=0;i<N;i++){
+        for (int j=0;j<N;j++){
+            cout<<board[i][j]<<" ";
         }
-        cout << '\n';
+        cout<<endl;
     }
+    cout<<"------------------"<<endl;
 }
 
-bool isSafe(const int row, const int col, const int size) {
-    int r, c;
-    // check along the column
-    for (r = 0; r < size; r++)
-        if (board[r][col])
-            return false;
-
-    // check along the row
-    for (c = 0; c < col; c++)
-        if (board[row][c])
-            return false;
-
-    // check diagonally
-    for (c = col-1, r = row-1; c >= 0 && r >= 0; c--, r--)
-        if (board[r][c])
-            return false;
-    for (c = col-1, r = row+1; c >= 0 && r < size; c--, r++)
-        if (board[r][c])
-            return false;
-
+bool isSafe(int board[N][N], int row, int col){
+    for (int i=0;i<col;i++){
+        if (board[row][i]==1) return false;
+    }
+    for (int i=row-1,j=col-1;i>=0&&j>=0;i--,j--){
+        if (board[i][j]==1) return false;
+    }
+    for (int i=row+1,j=col-1;i<N&&j>=0;i++,j--){
+        if (board[i][j]==1) return false;
+    }
     return true;
 }
 
-bool canPlaceQueens(const size_t col, const size_t size) {
-    if (col == size)
-        return true;
-
-    for (size_t row = 0; row < size; row++) {
-        if (isSafe(row, col, size)) {
-            board[row][col] = true;
-            if (canPlaceQueens(col+1, size))
-                return true;
-            board[row][col] = false;
+void NQueen(int board[N][N], int col, int &cnt){
+    if (col>=N){
+        cnt++;
+        PrintSolution(board);
+        return;
+    }
+    for (int i=0;i<N;i++){
+        if (isSafe(board,i,col)){
+            board[i][col]=1;
+            NQueen(board, col+1, cnt);
+            board[i][col]=0;
         }
     }
-
-    return false;
 }
 
-int main() {
-    int N;        // number of queens to place = N, size of board = NxN
-    cout << "Enter the number of queens to place (max " << MaxQueens << ") : ";
-    cin >> N;
+int main(){
 
-    initBoard(N);
-
-    if (canPlaceQueens(0, N)) {
-        cout << "Found a way!\n";
-        showBoard(N);
-    }
-    else
-        cout << "Couldn\'t find a way to place " << N << " queens on a " << N << "x" << N << " board\n";
-
-    return 0;
+    int board[N][N]={};
+    int cnt=0;
+    NQueen(board,0,cnt);
+    cout<<"No of Sol:"<<cnt<<endl;
+    if (cnt==0) cout<<"No Solution Exists: "<<endl;
+    else cout<<"Following are the resultant check Board:"<<endl;
 }
+
